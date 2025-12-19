@@ -6,9 +6,7 @@ import {
   TrendingUp,
   DollarSign,
   MapPin,
-  FileText,
-  Settings, 
-  HelpCircle
+  FileText
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -21,67 +19,47 @@ const Sidebar = () => {
         <span className="text-xl font-bold text-gray-800">DevMarket</span>
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-1">
+      <nav className="flex-1 px-4 py-4 space-y-1 flex flex-col">
         <div className="mb-6">
-          <Link href="/" className="flex items-center gap-3 px-4 py-3 text-indigo-600 bg-indigo-50 rounded-xl font-medium">
+          <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-indigo-600 bg-indigo-50 rounded-xl font-medium">
             <LayoutDashboard size={20} />
             <span>Dashboard</span>
           </Link>
         </div>
 
         <div className="space-y-1">
-          <Link href="#" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
+          <Link href="/job-streams" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
             <Activity size={20} />
             <span>Job Streams</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
+          <Link href="/skill-insights" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
             <TrendingUp size={20} />
             <span>Skill Insights</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
+          <Link href="/salary-insights" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
             <DollarSign size={20} />
             <span>Salary Insights</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
+          <Link href="/location-company" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
             <MapPin size={20} />
             <span>Location & Company</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
+          <Link href="/reports-exports" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
             <FileText size={20} />
             <span>Reports & Exports</span>
           </Link>
         </div>
 
-        <div className="mt-8">
-          <h3 className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-            Account
-          </h3>
-          <div className="space-y-1">
-            <Link href="#" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
-              <Settings size={20} />
-              <span>Settings</span>
-            </Link>
-            <Link href="#" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors">
-              <HelpCircle size={20} />
-              <span>Help Center</span>
-            </Link>
+        <div className="mt-auto mb-8">
+          <div className="px-4 py-4 bg-indigo-50 rounded-xl mx-2">
+            <h4 className="font-bold text-indigo-900 text-sm mb-2">Weekly Insights</h4>
+            <p className="text-xs text-indigo-700 mb-3">Get the latest market trends delivered to your inbox.</p>
+            <button className="w-full bg-indigo-600 text-white text-xs font-bold py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+              Subscribe Free
+            </button>
           </div>
         </div>
       </nav>
-
-      <div className="p-4 border-t border-gray-100">
-        <div className="bg-gray-50 rounded-xl p-4 text-center">
-          <div className="w-12 h-12 bg-gray-800 rounded-full mx-auto mb-3 overflow-hidden">
-             {/* Avatar placeholder */}
-             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" />
-          </div>
-          <h4 className="font-bold text-gray-900">Free Trial</h4>
-          <p className="text-sm text-gray-500 mb-3">18/30 days</p>
-          <button className="w-full bg-gray-900 text-white text-sm py-2 rounded-lg hover:bg-gray-800 transition-colors">
-            Unlock Features
-          </button>
-        </div>
-      </div>
     </aside>
   );
 };

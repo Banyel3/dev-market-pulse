@@ -1,151 +1,62 @@
-import React from "react";
-import { Edit2, Briefcase, GraduationCap, Pencil } from "lucide-react";
+import React from 'react';
+import { TrendingUp, ArrowRight, Mail } from 'lucide-react';
 
 const RightPanel = () => {
   return (
     <aside className="w-80 bg-white h-screen border-l border-gray-100 fixed right-0 top-0 overflow-y-auto p-6 hidden xl:block">
-      <div className="relative mb-6">
-        <div className="h-24 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-t-2xl -mx-6 -mt-6 mb-12 relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10"></div>
-        </div>
-        <div className="absolute top-12 left-0">
-          <div className="w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-white shadow-sm">
-            <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Angelica"
-              alt="Profile"
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-between items-start mt-2">
-          <div>
-            <h2 className="text-lg font-bold text-gray-900">Angelica Greeze</h2>
-            <p className="text-sm text-gray-500">UI / UX Designer</p>
-          </div>
-          <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-xs font-medium rounded-lg hover:bg-blue-600 transition-colors">
-            <Edit2 size={12} />
-            Edit Profile
-          </button>
-        </div>
-      </div>
-
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-bold text-gray-900">Availability</h3>
-          <button className="text-gray-400 hover:text-gray-600">
-            <Pencil size={14} />
-          </button>
-        </div>
-        <div className="bg-red-50 text-red-500 px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-2">
-          <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-          Available For Work
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-gray-900">Experience</h3>
-          <button className="text-gray-400 hover:text-gray-600">
-            <Pencil size={14} />
-          </button>
-        </div>
-
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Market Highlights</h3>
+        
         <div className="space-y-4">
-          <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 shrink-0">
-              <Briefcase size={18} />
+          <div className="p-4 bg-green-50 rounded-xl border border-green-100">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp size={16} className="text-green-600" />
+              <span className="text-sm font-bold text-green-700">Rising Fast</span>
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-gray-900">
-                UI / UX Designer
-              </h4>
-              <p className="text-xs text-gray-500">Ideologist Team - Remote</p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Jan 2022 - Present • 8 Mos
-              </p>
-            </div>
+            <h4 className="font-bold text-gray-900">Rust Developers</h4>
+            <p className="text-xs text-gray-600 mt-1">Demand up 24% this week in FinTech sector.</p>
           </div>
 
-          <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 shrink-0">
-              <Briefcase size={18} />
+          <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp size={16} className="text-blue-600" />
+              <span className="text-sm font-bold text-blue-700">Top Location</span>
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-gray-900">UI Designer</h4>
-              <p className="text-xs text-gray-500">Tigabatang - Fulltime</p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Jan 2022 - Present • 8 Mos
-              </p>
-            </div>
+            <h4 className="font-bold text-gray-900">Berlin, Germany</h4>
+            <p className="text-xs text-gray-600 mt-1">Highest volume of new startup roles posted.</p>
           </div>
         </div>
       </div>
 
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-gray-900">Education</h3>
-          <button className="text-gray-400 hover:text-gray-600">
-            <Pencil size={14} />
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Newsletter</h3>
+        <div className="bg-gray-900 rounded-2xl p-6 text-white">
+          <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center mb-4">
+            <Mail size={20} />
+          </div>
+          <h4 className="font-bold text-lg mb-2">Stay Ahead</h4>
+          <p className="text-sm text-gray-400 mb-4">
+            Get weekly insights on skills, salaries, and hiring trends.
+          </p>
+          <input 
+            type="email" 
+            placeholder="Enter your email" 
+            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder-gray-500 mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <button className="w-full py-2 bg-indigo-600 rounded-lg text-sm font-bold hover:bg-indigo-700 transition-colors">
+            Subscribe
           </button>
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0">
-              <GraduationCap size={18} />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-gray-900">
-                Oxford University
-              </h4>
-              <p className="text-xs text-gray-500">
-                Student - Software Engineering
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                2018 - 2021 • 3 Yrs
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0">
-              <GraduationCap size={18} />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-gray-900">
-                Oxford Vocational High School
-              </h4>
-              <p className="text-xs text-gray-500">
-                Student - Software Engineering
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                2015 - 2015 • 3 Yrs
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-gray-900">Skills</h3>
-          <button className="text-gray-400 hover:text-gray-600">
-            <Pencil size={14} />
-          </button>
+          <h3 className="text-lg font-bold text-gray-900">Trending Skills</h3>
+          <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">View All</button>
         </div>
         <div className="flex flex-wrap gap-2">
-          {[
-            "UI",
-            "Ux",
-            "Website Design",
-            "Mobile Design",
-            "Research",
-            "Interaction",
-          ].map((skill) => (
-            <span
-              key={skill}
-              className="px-3 py-1.5 bg-gray-50 text-gray-600 text-xs font-medium rounded-lg"
-            >
+          {['React', 'Python', 'AWS', 'Docker', 'Kubernetes', 'Go', 'TypeScript'].map((skill) => (
+            <span key={skill} className="px-3 py-1.5 bg-gray-50 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-100 cursor-pointer transition-colors">
               {skill}
             </span>
           ))}
