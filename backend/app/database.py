@@ -3,8 +3,12 @@ from app.config import get_settings
 
 settings = get_settings()
 
+# Use sync postgres driver for SQLModel compatibility
+# Replace asyncpg with psycopg for sync operations
+database_url = settings.database_url.replace("postgresql+asyncpg://", "postgresql+psycopg://")
+
 engine = create_engine(
-    settings.database_url,
+    database_url,
     echo=settings.debug,
     pool_pre_ping=True,
 )

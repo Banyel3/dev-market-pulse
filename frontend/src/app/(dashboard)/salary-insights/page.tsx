@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { api, SalaryData } from "@/lib/api";
+import { api } from "@/lib/api";
 
 interface ChartData {
   role: string;
@@ -232,7 +232,7 @@ const SalaryInsights = () => {
                   border: "none",
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
-                formatter={(value: number) => [`$${value}k`, ""]}
+                formatter={(value: number | undefined) => [`$${value || 0}k`, ""]}
               />
               <Legend />
               <Bar dataKey="min" stackId="a" fill="transparent" />
