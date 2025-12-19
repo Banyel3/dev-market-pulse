@@ -1,0 +1,14 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+sqlmodel==0.0.22
+psycopg2-binary==2.9.10
+python-dotenv==1.0.1
+alembic==1.14.0
+pydantic-settings==2.7.0
+requests==2.31.0
+beautifulsoup4==4.12.3
+lxml==5.1.0
+playwright==1.48.0
+celery==5.4.0
+redis==5.2.0
+flower==2.0.1

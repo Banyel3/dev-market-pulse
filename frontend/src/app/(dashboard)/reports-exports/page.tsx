@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import {
   FileText,
   Download,
@@ -6,9 +8,14 @@ import {
   CheckCircle,
   AlertCircle,
   FileSpreadsheet,
+  TrendingUp,
+  DollarSign,
+  MapPin,
 } from "lucide-react";
 
 const ReportsExports = () => {
+  const [showAllExports, setShowAllExports] = useState(false);
+
   const templates = [
     {
       title: "Weekly Skill Trends",
@@ -63,7 +70,25 @@ const ReportsExports = () => {
       size: "5.1 MB",
       status: "ready",
     },
+    {
+      id: "EXP-2023-005",
+      name: "Job Market Analysis - Q2",
+      type: "PDF",
+      date: "Jul 15, 2023",
+      size: "3.5 MB",
+      status: "ready",
+    },
+    {
+      id: "EXP-2023-006",
+      name: "Remote Work Trends",
+      type: "Excel",
+      date: "Jun 30, 2023",
+      size: "15 MB",
+      status: "ready",
+    },
   ];
+
+  const displayedExports = showAllExports ? exports : exports.slice(0, 4);
 
   return (
     <div className="space-y-10">
@@ -108,8 +133,11 @@ const ReportsExports = () => {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-gray-900">Recent Exports</h2>
-          <button className="text-sm text-indigo-600 font-medium hover:text-indigo-700">
-            View All History
+          <button
+            onClick={() => setShowAllExports(!showAllExports)}
+            className="text-sm text-indigo-600 font-medium hover:text-indigo-700"
+          >
+            {showAllExports ? "View Less" : "View All History"}
           </button>
         </div>
 
@@ -138,7 +166,7 @@ const ReportsExports = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {exports.map((item) => (
+              {displayedExports.map((item) => (
                 <tr
                   key={item.id}
                   className="hover:bg-gray-50 transition-colors"
@@ -203,7 +231,5 @@ const ReportsExports = () => {
     </div>
   );
 };
-
-import { TrendingUp, DollarSign, MapPin } from "lucide-react";
 
 export default ReportsExports;
