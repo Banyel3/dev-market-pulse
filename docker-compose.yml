@@ -1,0 +1,154 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: devmarket-postgres
+    environment:
+      POSTGRES_USER: devmarket
+      POSTGRES_PASSWORD: devmarket123
+      POSTGRES_DB: devmarket_pulse
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devmarket"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - devmarket-network
+
+  # Redis for Celery
+  redis:
+    image: redis:7-alpine
+    container_name: devmarket-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - devmarket-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: devmarket-backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://devmarket:devmarket123@postgres:5432/devmarket_pulse
+      REDIS_URL: redis://redis:6379/0
+      SCRAPING_ENABLED: "true"
+      MAX_JOBS_PER_SCRAPE: "50"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend/app:/app/app
+    networks:
+      - devmarket-network
+    command: >
+      sh -c "
+        echo 'Waiting for database...' &&
+        sleep 5 &&
+        python -m app.seed &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+  # Celery Worker
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: devmarket-celery-worker
+    environment:
+      DATABASE_URL: postgresql+asyncpg://devmarket:devmarket123@postgres:5432/devmarket_pulse
+      REDIS_URL: redis://redis:6379/0
+      SCRAPING_ENABLED: "true"
+      MAX_JOBS_PER_SCRAPE: "50"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    volumes:
+      - ./backend/app:/app/app
+    networks:
+      - devmarket-network
+    command: python -m app.worker
+
+  # Celery Beat Scheduler
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: devmarket-celery-beat
+    environment:
+      DATABASE_URL: postgresql+asyncpg://devmarket:devmarket123@postgres:5432/devmarket_pulse
+      REDIS_URL: redis://redis:6379/0
+      SCRAPING_ENABLED: "true"
+      MAX_JOBS_PER_SCRAPE: "50"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    volumes:
+      - ./backend/app:/app/app
+    networks:
+      - devmarket-network
+    command: python -m app.beat
+
+  # Flower - Celery Monitoring (Optional)
+  flower:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: devmarket-flower
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery-worker
+    networks:
+      - devmarket-network
+    command: celery -A app.celery_app flower --port=5555
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: devmarket-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - devmarket-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  devmarket-network:
+    driver: bridge
