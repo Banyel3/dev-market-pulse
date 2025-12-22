@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FileText,
   Download,
@@ -11,10 +11,15 @@ import {
   TrendingUp,
   DollarSign,
   MapPin,
+  Loader2,
 } from "lucide-react";
+import { api, ExportItem } from "@/lib/api";
 
 const ReportsExports = () => {
   const [showAllExports, setShowAllExports] = useState(false);
+  const [exports, setExports] = useState<ExportItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState<string | null>(null);
 
   const templates = [
     {
@@ -22,71 +27,100 @@ const ReportsExports = () => {
       desc: "Top growing and declining skills with week-over-week analysis.",
       icon: TrendingUp,
       color: "bg-blue-50 text-blue-600",
+      action: "skills",
     },
     {
       title: "Salary Benchmarks",
       desc: "Comprehensive salary data by role, location, and experience level.",
       icon: DollarSign,
       color: "bg-green-50 text-green-600",
+      action: "salaries",
     },
     {
       title: "Location Analysis",
       desc: "Job volume and salary heatmaps across major tech hubs.",
       icon: MapPin,
       color: "bg-purple-50 text-purple-600",
+      action: "locations",
     },
   ];
 
-  const exports = [
-    {
-      id: "EXP-2023-001",
-      name: "Full Job Dump - Oct 2023",
-      type: "CSV",
-      date: "Oct 24, 2023",
-      size: "45 MB",
-      status: "ready",
-    },
-    {
-      id: "EXP-2023-002",
-      name: "Salary Report - Q3",
-      type: "PDF",
-      date: "Oct 22, 2023",
-      size: "2.4 MB",
-      status: "ready",
-    },
-    {
-      id: "EXP-2023-003",
-      name: "Skill Trends - Raw Data",
-      type: "Excel",
-      date: "Oct 20, 2023",
-      size: "12 MB",
-      status: "failed",
-    },
-    {
-      id: "EXP-2023-004",
-      name: "Company List - EMEA",
-      type: "CSV",
-      date: "Oct 18, 2023",
-      size: "5.1 MB",
-      status: "ready",
-    },
-    {
-      id: "EXP-2023-005",
-      name: "Job Market Analysis - Q2",
-      type: "PDF",
-      date: "Jul 15, 2023",
-      size: "3.5 MB",
-      status: "ready",
-    },
-    {
-      id: "EXP-2023-006",
-      name: "Remote Work Trends",
-      type: "Excel",
-      date: "Jun 30, 2023",
-      size: "15 MB",
-      status: "ready",
-    },
-  ];
+  useEffect(() => {
+    const fetchExports = async () => {
+      setLoading(true);
+      try {
+        const result = await api.getExportSummary();
+        setExports(result.exports);
+      } catch (error) {
+        console.error("Failed to fetch exports:", error);
+        // Fallback to empty exports
+        setExports([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExports();
+  }, []);
+
+  const handleDownload = async (exportItem: ExportItem) => {
+    setDownloading(exportItem.id);
+    try {
+      const response = await fetch(`http://localhost:8000${exportItem.endpoint}`);
+      const data = await response.json();
+      
+      // Create downloadable file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${exportItem.id}_${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download failed:", error);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const handleGenerateReport = async (action: string) => {
+    try {
+      let data;
+      let filename;
+      
+      switch (action) {
+        case "skills":
+          data = await api.exportSkills();
+          filename = "skills_report";
+          break;
+        case "salaries":
+          data = await api.getSalaries({});
+          filename = "salary_report";
+          break;
+        case "locations":
+          data = await api.getLocations({ limit: 100 });
+          filename = "locations_report";
+          break;
+        default:
+          return;
+      }
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${filename}_${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Report generation failed:", error);
+    }
+  };
 
   const displayedExports = showAllExports ? exports : exports.slice(0, 4);
 
@@ -121,7 +155,11 @@ const ReportsExports = () => {
                 {template.title}
               </h3>
               <p className="text-sm text-gray-500 mb-6">{template.desc}</p>
-              <button className="w-full py-2.5 bg-gray-50 text-gray-700 font-medium rounded-xl hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
+              <button 
+                onClick={() => handleGenerateReport(template.action)}
+                className="w-full py-2.5 bg-gray-50 text-gray-700 font-medium rounded-xl hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+              >
+                <Download size={16} />
                 Generate Report
               </button>
             </div>
@@ -216,14 +254,36 @@ const ReportsExports = () => {
                   </td>
                   <td className="py-4 px-6 text-right">
                     {item.status === "ready" && (
-                      <button className="text-indigo-600 hover:text-indigo-800 font-medium text-sm flex items-center justify-end gap-1 ml-auto">
-                        <Download size={16} />
-                        Download
+                      <button 
+                        onClick={() => handleDownload(item)}
+                        disabled={downloading === item.id}
+                        className="text-indigo-600 hover:text-indigo-800 font-medium text-sm flex items-center justify-end gap-1 ml-auto disabled:opacity-50"
+                      >
+                        {downloading === item.id ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <Download size={16} />
+                        )}
+                        {downloading === item.id ? "Downloading..." : "Download"}
                       </button>
                     )}
                   </td>
                 </tr>
               ))}
+              {displayedExports.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-gray-500">
+                    No exports available yet. Generate a report to get started.
+                  </td>
+                </tr>
+              )}
+              {loading && (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center">
+                    <Loader2 size={24} className="animate-spin mx-auto text-indigo-600" />
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

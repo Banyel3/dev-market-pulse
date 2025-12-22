@@ -94,6 +94,50 @@ export interface JobStreamsResponse {
   streams: JobStream[];
 }
 
+export interface ExportItem {
+  id: string;
+  name: string;
+  type: string;
+  date: string;
+  size: string;
+  status: string;
+  endpoint: string;
+}
+
+export interface ExportSummaryResponse {
+  exports: ExportItem[];
+  generated_at: string;
+}
+
+export interface JobsExportResponse {
+  jobs: Array<{
+    id: number;
+    title: string;
+    company_id: number | null;
+    location_id: number | null;
+    source: string;
+    salary_min: number | null;
+    salary_max: number | null;
+    employment_type: string | null;
+    seniority: string | null;
+    remote_type: string | null;
+    created_at: string | null;
+  }>;
+  total: number;
+  exported_at: string;
+}
+
+export interface SkillsExportResponse {
+  skills: Array<{
+    id: number;
+    name: string;
+    category: string;
+    demand_count: number;
+  }>;
+  total: number;
+  exported_at: string;
+}
+
 async function fetchAPI<T>(
   endpoint: string,
   options?: RequestInit
@@ -178,6 +222,14 @@ export const api = {
 
   // Job Streams
   getJobStreams: () => fetchAPI<JobStreamsResponse>("/api/dashboard/streams"),
+
+  // Exports
+  getExportSummary: () => fetchAPI<ExportSummaryResponse>("/api/dashboard/exports/summary"),
+  
+  exportJobs: (format: "json" | "csv" = "json") => 
+    fetchAPI<JobsExportResponse>(`/api/dashboard/exports/jobs?format=${format}`),
+  
+  exportSkills: () => fetchAPI<SkillsExportResponse>("/api/dashboard/exports/skills"),
 
   // Health check
   healthCheck: () => fetchAPI<{ status: string; version: string }>("/health"),

@@ -153,11 +153,21 @@ class BaseScraper(ABC):
         found_skills = []
         
         for skill, category in skill_patterns.items():
-            if skill.lower() in text:
-                # Normalize skill name
-                skill_name = skill.title() if len(skill) > 3 else skill.upper()
-                if skill_name not in found_skills:
-                    found_skills.append(skill_name)
+            # Use word boundary matching for short skills (<=3 chars)
+            if len(skill) <= 3:
+                import re
+                # Match whole word only (with word boundaries)
+                pattern = r'\b' + re.escape(skill.lower()) + r'\b'
+                if re.search(pattern, text):
+                    skill_name = skill.upper()
+                    if skill_name not in found_skills:
+                        found_skills.append(skill_name)
+            else:
+                if skill.lower() in text:
+                    # Normalize skill name
+                    skill_name = skill.title() if len(skill) > 3 else skill.upper()
+                    if skill_name not in found_skills:
+                        found_skills.append(skill_name)
         
         return found_skills
     
