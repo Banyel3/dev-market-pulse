@@ -1,14 +1,17 @@
 # DevMarket Pulse - Celery Setup Guide
 
 ## Overview
+
 This application uses **Celery** with **Redis** for automated daily job scraping and analytics aggregation.
 
 ## Prerequisites
 
 ### Install Redis
+
 You need Redis running locally. Choose one option:
 
 **Option 1: WSL (Recommended for Windows)**
+
 ```bash
 wsl --install
 # Then in WSL:
@@ -18,6 +21,7 @@ sudo service redis-server start
 ```
 
 **Option 2: Docker**
+
 ```bash
 docker run -d -p 6379:6379 --name redis redis:latest
 ```
@@ -26,6 +30,7 @@ docker run -d -p 6379:6379 --name redis redis:latest
 Download from: https://github.com/microsoftarchive/redis/releases
 
 ### Install Python Dependencies
+
 ```bash
 cd backend
 pip install -r requirements.txt
@@ -34,6 +39,7 @@ pip install -r requirements.txt
 ## Running the System
 
 ### 1. Start Redis
+
 ```bash
 # WSL
 sudo service redis-server start
@@ -47,7 +53,9 @@ redis-cli ping
 ```
 
 ### 2. Start Celery Worker
+
 Opens a new terminal and run:
+
 ```bash
 cd backend
 python -m app.worker
@@ -56,7 +64,9 @@ python -m app.worker
 This processes the background tasks (scraping, aggregation, cleanup).
 
 ### 3. Start Celery Beat Scheduler
+
 Open another terminal and run:
+
 ```bash
 cd backend
 python -m app.beat
@@ -65,7 +75,9 @@ python -m app.beat
 This schedules tasks to run at specific times.
 
 ### 4. Start FastAPI Server
+
 In another terminal:
+
 ```bash
 cd backend
 uvicorn app.main:app --reload
@@ -74,9 +86,11 @@ uvicorn app.main:app --reload
 ## Scheduled Tasks
 
 ### Daily at 12:00 AM (Midnight)
+
 - **Scrape Jobs**: Collect new job postings from Indeed and RemoteOK
 
 ### Daily at 1:00 AM
+
 - **Aggregate Stats**: Calculate daily statistics for:
   - Skill demand trends
   - Company hiring trends
@@ -84,17 +98,20 @@ uvicorn app.main:app --reload
   - Global market metrics
 
 ### Daily at 2:00 AM
+
 - **Cleanup Old Jobs**: Mark jobs older than 60 days as inactive
 
 ## Manual Task Triggers
 
 ### Run Scraping Now
+
 ```python
 from app.tasks import trigger_scraping_now
 trigger_scraping_now.delay()
 ```
 
 ### Aggregate Stats for Specific Date
+
 ```python
 from app.tasks import trigger_aggregation_now
 trigger_aggregation_now.delay(target_date="2025-12-19")
@@ -103,7 +120,9 @@ trigger_aggregation_now.delay(target_date="2025-12-19")
 ## Monitoring
 
 ### Flower - Web-based Monitoring
+
 Start Flower to monitor tasks:
+
 ```bash
 cd backend
 celery -A app.celery_app flower --port=5555
@@ -112,6 +131,7 @@ celery -A app.celery_app flower --port=5555
 Then open: http://localhost:5555
 
 ### Check Task Status
+
 ```python
 from app.celery_app import celery_app
 
@@ -130,6 +150,7 @@ celery_app.control.inspect().stats()
 The system automatically tracks daily metrics:
 
 ### Check Python Job Trends
+
 ```python
 from sqlmodel import Session, select
 from app.database import engine
@@ -158,6 +179,7 @@ for stat in stats:
 ```
 
 ### Query Daily Global Stats
+
 ```python
 from app.models import DailyGlobalStats
 
@@ -176,23 +198,29 @@ print(f"Active Companies: {today_stats.unique_companies}")
 ## Troubleshooting
 
 ### Redis Connection Error
+
 ```
 Error: Error 10061 connecting to localhost:6379
 ```
+
 **Solution**: Make sure Redis is running (`redis-cli ping`)
 
 ### Task Not Running
+
 1. Check Celery worker is running
 2. Check Celery beat is running
 3. Check Redis connection
 4. View logs in worker/beat terminals
 
 ### Manual Stats Aggregation
+
 If you need to backfill historical data:
+
 ```bash
 cd backend
 python
 ```
+
 ```python
 from app.tasks import aggregate_daily_stats_task
 from datetime import datetime, timedelta
@@ -206,6 +234,7 @@ for i in range(7):
 ## Environment Variables
 
 Add to `.env` file:
+
 ```env
 # Redis
 REDIS_URL=redis://localhost:6379/0

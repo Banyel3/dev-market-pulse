@@ -26,6 +26,7 @@ docker-compose up
 ```
 
 That's it! Docker will automatically:
+
 - Set up PostgreSQL database
 - Set up Redis for task queue
 - Start the FastAPI backend
@@ -72,12 +73,14 @@ See [README.docker.md](README.docker.md) for detailed Docker documentation.
 ## Tech Stack
 
 ### Frontend
+
 - **Next.js 15** - React framework with App Router
 - **TypeScript** - Type-safe code
 - **Tailwind CSS** - Utility-first styling
 - **Recharts** - Data visualization
 
 ### Backend
+
 - **FastAPI** - Modern Python web framework
 - **SQLModel** - SQL database ORM
 - **PostgreSQL** - Primary database
@@ -87,12 +90,14 @@ See [README.docker.md](README.docker.md) for detailed Docker documentation.
 - **BeautifulSoup4** - HTML parsing
 
 ### Infrastructure
+
 - **Docker & Docker Compose** - Containerization
 - **Flower** - Celery monitoring UI
 
 ## Local Development (Without Docker)
 
 ### Prerequisites
+
 - Node.js 20+
 - Python 3.11+
 - PostgreSQL 16+
@@ -248,6 +253,7 @@ docker-compose exec backend python aggregate_stats.py backfill 7
 ## Monitoring
 
 - **Flower Dashboard**: http://localhost:5555
+
   - View active/completed tasks
   - Monitor worker health
   - Track task execution times
@@ -270,6 +276,7 @@ MIT License - see LICENSE file for details
 ## Support
 
 For issues and questions:
+
 - Create an issue on GitHub
 - Check [README.docker.md](README.docker.md) for Docker-specific help
 - Check [backend/CELERY_SETUP.md](backend/CELERY_SETUP.md) for Celery configuration

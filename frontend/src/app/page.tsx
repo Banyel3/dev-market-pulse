@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -7,8 +9,36 @@ import {
   TrendingUp,
   CheckCircle,
 } from "lucide-react";
+import { api } from "@/lib/api";
 
 export default function LandingPage() {
+  const [stats, setStats] = useState({
+    totalJobs: 500,
+    locations: 150,
+    skills: 12,
+    companies: 250,
+    loading: true,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const kpis = await api.getKPIs();
+        setStats({
+          totalJobs: Math.round(kpis.jobs_last_7d / 10),
+          locations: kpis.unique_locations,
+          skills: kpis.total_skills,
+          companies: kpis.unique_companies,
+          loading: false,
+        });
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+        setStats((prev) => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchStats();
+  }, []);
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -111,20 +141,44 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
-                <div className="text-4xl font-bold text-white mb-2">500k+</div>
-                <div className="text-gray-400">Jobs Tracked Daily</div>
+                {stats.loading ? (
+                  <div className="h-10 w-32 bg-gray-700 rounded animate-pulse mx-auto mb-2"></div>
+                ) : (
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {stats.totalJobs.toLocaleString()}+
+                  </div>
+                )}
+                <div className="text-gray-400">Jobs This Week</div>
               </div>
               <div>
-                <div className="text-4xl font-bold text-white mb-2">150+</div>
-                <div className="text-gray-400">Countries Covered</div>
+                {stats.loading ? (
+                  <div className="h-10 w-24 bg-gray-700 rounded animate-pulse mx-auto mb-2"></div>
+                ) : (
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {stats.locations}+
+                  </div>
+                )}
+                <div className="text-gray-400">Active Locations</div>
               </div>
               <div>
-                <div className="text-4xl font-bold text-white mb-2">12k+</div>
-                <div className="text-gray-400">Skills Indexed</div>
+                {stats.loading ? (
+                  <div className="h-10 w-24 bg-gray-700 rounded animate-pulse mx-auto mb-2"></div>
+                ) : (
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {stats.skills}+
+                  </div>
+                )}
+                <div className="text-gray-400">Skills Tracked</div>
               </div>
               <div>
-                <div className="text-4xl font-bold text-white mb-2">24/7</div>
-                <div className="text-gray-400">Real-time Updates</div>
+                {stats.loading ? (
+                  <div className="h-10 w-24 bg-gray-700 rounded animate-pulse mx-auto mb-2"></div>
+                ) : (
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {stats.companies}+
+                  </div>
+                )}
+                <div className="text-gray-400">Hiring Companies</div>
               </div>
             </div>
           </div>

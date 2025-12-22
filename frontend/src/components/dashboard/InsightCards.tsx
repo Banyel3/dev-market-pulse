@@ -182,7 +182,7 @@ const InsightCards = () => {
             skillsRes.skills.map((s) => ({
               name: s.name,
               subtitle: s.category,
-              value: Math.round(s.growth_rate),
+              value: s.demand_count, // Number of jobs requiring this skill
             }))
           );
         }

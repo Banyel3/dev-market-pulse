@@ -232,7 +232,10 @@ const SalaryInsights = () => {
                   border: "none",
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
-                formatter={(value: number | undefined) => [`$${value || 0}k`, ""]}
+                formatter={(value: number | undefined) => [
+                  `$${value || 0}k`,
+                  "",
+                ]}
               />
               <Legend />
               <Bar dataKey="min" stackId="a" fill="transparent" />

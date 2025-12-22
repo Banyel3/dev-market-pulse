@@ -306,10 +306,10 @@ const SkillInsights = () => {
                     border: "none",
                     boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                   }}
-                  formatter={(value: number, name: string) => [
-                    value.toLocaleString() + " jobs",
-                    "Demand",
-                  ]}
+                  formatter={(
+                    value: number | undefined,
+                    name: string | undefined
+                  ) => [(value ?? 0).toLocaleString() + " jobs", "Demand"]}
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={32}>
                   {filteredData.map((entry, index) => (

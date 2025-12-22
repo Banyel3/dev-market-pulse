@@ -9,6 +9,7 @@ docker-compose up
 ```
 
 This will start:
+
 - **PostgreSQL** (port 5432) - Database
 - **Redis** (port 6379) - Task queue broker
 - **Backend API** (port 8000) - FastAPI application
@@ -31,20 +32,24 @@ This will start:
 ### Service Details
 
 #### PostgreSQL
+
 - Database: `devmarket_pulse`
 - User: `devmarket`
 - Password: `devmarket123`
 - Data persisted in `postgres_data` volume
 
 #### Redis
+
 - Used by Celery for task queue
 - Data persisted in `redis_data` volume
 
 #### Backend API
+
 - Automatically seeds database on startup
 - Hot-reload enabled for development
 
 #### Celery Services
+
 - **Worker**: Executes background tasks (scraping, aggregation)
 - **Beat**: Schedules tasks (midnight scraping, 1 AM aggregation, 2 AM cleanup)
 - **Flower**: Web-based monitoring UI
@@ -52,16 +57,19 @@ This will start:
 ## Commands
 
 ### Start All Services
+
 ```bash
 docker-compose up
 ```
 
 ### Start in Detached Mode
+
 ```bash
 docker-compose up -d
 ```
 
 ### View Logs
+
 ```bash
 # All services
 docker-compose logs -f
@@ -73,21 +81,25 @@ docker-compose logs -f frontend
 ```
 
 ### Stop All Services
+
 ```bash
 docker-compose down
 ```
 
 ### Stop and Remove Volumes (Clean Start)
+
 ```bash
 docker-compose down -v
 ```
 
 ### Rebuild Images
+
 ```bash
 docker-compose build
 ```
 
 ### Rebuild and Start
+
 ```bash
 docker-compose up --build
 ```
@@ -95,6 +107,7 @@ docker-compose up --build
 ## Development Workflow
 
 ### Backend Development
+
 The backend code is mounted as a volume, so changes to Python files will auto-reload:
 
 ```bash
@@ -105,16 +118,19 @@ The backend code is mounted as a volume, so changes to Python files will auto-re
 ### Database Operations
 
 #### Execute SQL
+
 ```bash
 docker-compose exec postgres psql -U devmarket -d devmarket_pulse
 ```
 
 #### Backup Database
+
 ```bash
 docker-compose exec postgres pg_dump -U devmarket devmarket_pulse > backup.sql
 ```
 
 #### Restore Database
+
 ```bash
 docker-compose exec -T postgres psql -U devmarket devmarket_pulse < backup.sql
 ```
@@ -122,6 +138,7 @@ docker-compose exec -T postgres psql -U devmarket devmarket_pulse < backup.sql
 ### Manual Task Execution
 
 #### Run Scrapers Manually
+
 ```bash
 docker-compose exec backend python -c "
 from app.tasks import scrape_jobs_task
@@ -130,6 +147,7 @@ scrape_jobs_task.apply_async()
 ```
 
 #### Aggregate Statistics
+
 ```bash
 # Specific date
 docker-compose exec backend python aggregate_stats.py 2025-12-19
@@ -139,6 +157,7 @@ docker-compose exec backend python aggregate_stats.py backfill 7
 ```
 
 #### Seed Database
+
 ```bash
 docker-compose exec backend python -m app.seed
 ```
@@ -146,6 +165,7 @@ docker-compose exec backend python -m app.seed
 ## Troubleshooting
 
 ### Database Connection Issues
+
 ```bash
 # Check PostgreSQL is running
 docker-compose ps postgres
@@ -158,6 +178,7 @@ docker-compose restart postgres
 ```
 
 ### Celery Issues
+
 ```bash
 # Check worker status
 docker-compose logs celery-worker
@@ -170,6 +191,7 @@ docker-compose restart celery-worker celery-beat
 ```
 
 ### Redis Issues
+
 ```bash
 # Test Redis connection
 docker-compose exec redis redis-cli ping
@@ -179,7 +201,9 @@ docker-compose logs redis
 ```
 
 ### Clean Slate
+
 If you need to start fresh:
+
 ```bash
 # Stop everything and remove volumes
 docker-compose down -v
@@ -204,6 +228,7 @@ For production, update the following in `docker-compose.yml`:
 7. **Use environment files** instead of hardcoded values
 
 Example production override:
+
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
@@ -217,6 +242,7 @@ cp .env.example .env
 ```
 
 Variables:
+
 - `DATABASE_URL` - PostgreSQL connection string
 - `REDIS_URL` - Redis connection string
 - `SCRAPING_ENABLED` - Enable/disable scrapers
@@ -236,10 +262,12 @@ View scheduled tasks in Flower: http://localhost:5555
 ## Data Persistence
 
 Data is persisted in Docker volumes:
+
 - `postgres_data` - Database data
 - `redis_data` - Redis data
 
 To backup volumes:
+
 ```bash
 docker run --rm -v devmarket-pulse_postgres_data:/data -v $(pwd):/backup alpine tar czf /backup/postgres-backup.tar.gz /data
 ```
@@ -247,6 +275,7 @@ docker run --rm -v devmarket-pulse_postgres_data:/data -v $(pwd):/backup alpine 
 ## Health Checks
 
 Services include health checks:
+
 - PostgreSQL: `pg_isready`
 - Redis: `redis-cli ping`
 
