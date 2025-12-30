@@ -49,6 +49,8 @@ class CompanyItem(BaseModel):
     logo_url: Optional[str]
     active_jobs: int
     top_skill: Optional[str]
+    location: Optional[str] = None
+    is_ph_company: bool = False
 
 
 class CompanyListResponse(BaseModel):
@@ -63,6 +65,8 @@ class LocationItem(BaseModel):
     job_count: int
     growth_rate: float
     avg_salary: float
+    currency: str = "USD"
+    is_remote: bool = False
 
 
 class LocationListResponse(BaseModel):
@@ -76,6 +80,7 @@ class SalaryDataPoint(BaseModel):
     median_salary: float
     max_salary: float
     job_count: int
+    currency: str = "USD"
 
 
 class SalaryInsightResponse(BaseModel):

@@ -249,7 +249,7 @@ def get_top_companies(
     limit: int = Query(10, le=50),
     session: Session = Depends(get_session)
 ):
-    """Get most active companies by job postings."""
+    """Get most active companies - Philippines companies prioritized."""
     # Get companies with job counts
     results = session.exec(
         select(
@@ -260,10 +260,11 @@ def get_top_companies(
         .where(JobPosting.is_active == True)
         .group_by(Company.id)
         .order_by(func.count(JobPosting.id).desc())
-        .limit(limit)
     ).all()
     
-    companies = []
+    ph_companies = []
+    other_companies = []
+    
     for company, job_count in results:
         # Get top skill for company
         top_skill_result = session.exec(
@@ -276,16 +277,34 @@ def get_top_companies(
             .limit(1)
         ).first()
         
-        companies.append(CompanyItem(
+        # Check if Philippines company
+        hq_location = company.hq_location
+        is_ph = False
+        location_str = None
+        
+        if hq_location:
+            is_ph = hq_location.country in ["Philippines", "PH", "Ph"]
+            location_str = f"{hq_location.city}, {hq_location.country}"
+        
+        company_item = CompanyItem(
             id=company.id,
             name=company.name,
             industry=company.industry or "Technology",
             logo_url=company.logo_url,
             active_jobs=job_count,
-            top_skill=top_skill_result
-        ))
+            top_skill=top_skill_result,
+            location=location_str,
+            is_ph_company=is_ph
+        )
+        
+        if is_ph:
+            ph_companies.append(company_item)
+        else:
+            other_companies.append(company_item)
     
-    return CompanyListResponse(companies=companies, total=len(companies))
+    # Philippines first, then others
+    all_companies = ph_companies + other_companies
+    return CompanyListResponse(companies=all_companies[:limit], total=len(all_companies))
 
 
 @router.get("/locations", response_model=LocationListResponse)
@@ -294,7 +313,7 @@ def get_top_locations(
     limit: int = Query(10, le=50),
     session: Session = Depends(get_session)
 ):
-    """Get top hiring locations."""
+    """Get top hiring locations - Philippines locations prioritized."""
     query = (
         select(
             Location,
@@ -310,10 +329,11 @@ def get_top_locations(
     results = session.exec(
         query.group_by(Location.id)
         .order_by(func.count(JobPosting.id).desc())
-        .limit(limit)
     ).all()
     
-    locations = []
+    ph_locations = []
+    other_locations = []
+    
     for location, job_count in results:
         # Get average salary for location
         avg_salary = session.exec(
@@ -324,20 +344,45 @@ def get_top_locations(
             )
         ).first() or 100000
         
+        # Determine if Philippines location
+        is_ph = location.country in ["Philippines", "PH", "Ph"]
+        is_remote = location.city.lower() == "remote" or location.country.lower() == "remote"
+        
+        # Default salary based on location type
+        if avg_salary == 100000:  # Default fallback
+            avg_salary = 600000 if is_ph and not is_remote else 100000
+        
+        # Determine currency: PHP for PH non-remote jobs, USD for remote and international
+        currency = "PHP" if is_ph and not is_remote else "USD"
+        
+        # Convert to PHP if needed (1 USD = 56 PHP)
+        if is_ph and not is_remote and currency == "PHP" and avg_salary < 10000:
+            # Salary likely in USD, convert to PHP
+            avg_salary = avg_salary * 56
+        
         # Random growth rate for demo
         import random
         growth_rate = random.uniform(3.0, 20.0)
         
-        locations.append(LocationItem(
+        location_item = LocationItem(
             id=location.id,
             city=location.city,
             country=location.country,
             job_count=job_count,
             growth_rate=round(growth_rate, 1),
-            avg_salary=round(float(avg_salary), 0)
-        ))
+            avg_salary=round(float(avg_salary), 0),
+            currency=currency,
+            is_remote=is_remote
+        )
+        
+        if is_ph:
+            ph_locations.append(location_item)
+        else:
+            other_locations.append(location_item)
     
-    return LocationListResponse(locations=locations, total=len(locations))
+    # Philippines first, then others
+    all_locations = ph_locations + other_locations
+    return LocationListResponse(locations=all_locations[:limit], total=len(all_locations))
 
 
 @router.get("/salaries", response_model=SalaryInsightResponse)
@@ -390,7 +435,8 @@ def get_salary_insights(
                 min_salary=min_sal,
                 median_salary=median,
                 max_salary=max_sal,
-                job_count=count
+                job_count=count,
+                currency="USD"
             ))
     
     # If no pattern matches found, fall back to seniority-based grouping
@@ -424,7 +470,8 @@ def get_salary_insights(
                     min_salary=float(result[0]),
                     median_salary=float(result[1]),
                     max_salary=float(result[2]),
-                    job_count=result[3]
+                    job_count=result[3],
+                    currency="USD"
                 ))
     
     # Get top paying location

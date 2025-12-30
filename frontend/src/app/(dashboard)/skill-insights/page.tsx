@@ -49,7 +49,13 @@ const SkillInsights = () => {
   });
   const [newSkillsCount, setNewSkillsCount] = useState(12);
 
-  const categories = ["Languages", "Frameworks", "Tools", "Cloud", "Databases"];
+  const categories = [
+    { label: "Languages", value: "language" },
+    { label: "Frameworks", value: "framework" },
+    { label: "Tools", value: "tool" },
+    { label: "Cloud", value: "cloud" },
+    { label: "Databases", value: "database" },
+  ];
 
   const timeRangeMap: Record<string, string> = {
     "7d": "Last 7 Days",
@@ -168,16 +174,16 @@ const SkillInsights = () => {
               <div className="space-y-2">
                 {categories.map((cat) => (
                   <label
-                    key={cat}
+                    key={cat.value}
                     className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-gray-900"
                   >
                     <input
                       type="checkbox"
-                      checked={selectedCategories.includes(cat)}
-                      onChange={() => toggleCategory(cat)}
+                      checked={selectedCategories.includes(cat.value)}
+                      onChange={() => toggleCategory(cat.value)}
                       className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
-                    {cat}
+                    {cat.label}
                   </label>
                 ))}
               </div>

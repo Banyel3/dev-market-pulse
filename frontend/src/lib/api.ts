@@ -42,6 +42,8 @@ export interface CompanyItem {
   logo_url: string | null;
   active_jobs: number;
   top_skill: string | null;
+  location?: string;
+  is_ph_company: boolean;
 }
 
 export interface CompaniesResponse {
@@ -56,6 +58,8 @@ export interface LocationItem {
   job_count: number;
   growth_rate: number;
   avg_salary: number;
+  currency: string;
+  is_remote: boolean;
 }
 
 export interface LocationsResponse {
@@ -69,6 +73,7 @@ export interface SalaryItem {
   median_salary: number;
   max_salary: number;
   job_count: number;
+  currency: string;
 }
 
 export interface SalariesResponse {
@@ -224,12 +229,16 @@ export const api = {
   getJobStreams: () => fetchAPI<JobStreamsResponse>("/api/dashboard/streams"),
 
   // Exports
-  getExportSummary: () => fetchAPI<ExportSummaryResponse>("/api/dashboard/exports/summary"),
-  
-  exportJobs: (format: "json" | "csv" = "json") => 
-    fetchAPI<JobsExportResponse>(`/api/dashboard/exports/jobs?format=${format}`),
-  
-  exportSkills: () => fetchAPI<SkillsExportResponse>("/api/dashboard/exports/skills"),
+  getExportSummary: () =>
+    fetchAPI<ExportSummaryResponse>("/api/dashboard/exports/summary"),
+
+  exportJobs: (format: "json" | "csv" = "json") =>
+    fetchAPI<JobsExportResponse>(
+      `/api/dashboard/exports/jobs?format=${format}`
+    ),
+
+  exportSkills: () =>
+    fetchAPI<SkillsExportResponse>("/api/dashboard/exports/skills"),
 
   // Health check
   healthCheck: () => fetchAPI<{ status: string; version: string }>("/health"),

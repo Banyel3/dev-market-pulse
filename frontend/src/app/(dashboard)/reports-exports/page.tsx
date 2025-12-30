@@ -66,15 +66,21 @@ const ReportsExports = () => {
   const handleDownload = async (exportItem: ExportItem) => {
     setDownloading(exportItem.id);
     try {
-      const response = await fetch(`http://localhost:8000${exportItem.endpoint}`);
+      const response = await fetch(
+        `http://localhost:8000${exportItem.endpoint}`
+      );
       const data = await response.json();
-      
+
       // Create downloadable file
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json",
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${exportItem.id}_${new Date().toISOString().split("T")[0]}.json`;
+      a.download = `${exportItem.id}_${
+        new Date().toISOString().split("T")[0]
+      }.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -90,7 +96,7 @@ const ReportsExports = () => {
     try {
       let data;
       let filename;
-      
+
       switch (action) {
         case "skills":
           data = await api.exportSkills();
@@ -107,8 +113,10 @@ const ReportsExports = () => {
         default:
           return;
       }
-      
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json",
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -155,7 +163,7 @@ const ReportsExports = () => {
                 {template.title}
               </h3>
               <p className="text-sm text-gray-500 mb-6">{template.desc}</p>
-              <button 
+              <button
                 onClick={() => handleGenerateReport(template.action)}
                 className="w-full py-2.5 bg-gray-50 text-gray-700 font-medium rounded-xl hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
               >
@@ -254,7 +262,7 @@ const ReportsExports = () => {
                   </td>
                   <td className="py-4 px-6 text-right">
                     {item.status === "ready" && (
-                      <button 
+                      <button
                         onClick={() => handleDownload(item)}
                         disabled={downloading === item.id}
                         className="text-indigo-600 hover:text-indigo-800 font-medium text-sm flex items-center justify-end gap-1 ml-auto disabled:opacity-50"
@@ -264,7 +272,9 @@ const ReportsExports = () => {
                         ) : (
                           <Download size={16} />
                         )}
-                        {downloading === item.id ? "Downloading..." : "Download"}
+                        {downloading === item.id
+                          ? "Downloading..."
+                          : "Download"}
                       </button>
                     )}
                   </td>
@@ -280,7 +290,10 @@ const ReportsExports = () => {
               {loading && (
                 <tr>
                   <td colSpan={6} className="py-8 text-center">
-                    <Loader2 size={24} className="animate-spin mx-auto text-indigo-600" />
+                    <Loader2
+                      size={24}
+                      className="animate-spin mx-auto text-indigo-600"
+                    />
                   </td>
                 </tr>
               )}

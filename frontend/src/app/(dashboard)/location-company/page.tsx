@@ -20,6 +20,8 @@ interface CompanyDisplay {
   openRoles: number;
   velocity: string;
   topSkill: string;
+  location?: string;
+  isPhCompany?: boolean;
 }
 
 const fallbackLocations: LocationDisplay[] = [
@@ -146,6 +148,22 @@ const LocationCompany = () => {
   const [companies, setCompanies] =
     useState<CompanyDisplay[]>(fallbackCompanies);
   const [loading, setLoading] = useState(true);
+  const [salaryPeriod, setSalaryPeriod] = useState<"monthly" | "yearly">(
+    "yearly"
+  );
+
+  const formatSalary = (
+    amount: number,
+    currency: string = "USD",
+    isRemote: boolean = false
+  ): string => {
+    const value = salaryPeriod === "monthly" ? amount / 12 : amount;
+
+    if (currency === "PHP") {
+      return `₱${Math.round(value / 1000)}k`;
+    }
+    return `$${Math.round(value / 1000)}k`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -164,7 +182,7 @@ const LocationCompany = () => {
               country: l.country,
               jobs: l.job_count,
               growth: `+${Math.round(l.growth_rate)}%`,
-              salary: `$${Math.round(l.avg_salary / 1000)}k`,
+              salary: formatSalary(l.avg_salary, l.currency, l.is_remote),
             })
           );
           setLocations(mappedLocs);
@@ -179,6 +197,8 @@ const LocationCompany = () => {
               openRoles: c.active_jobs,
               velocity: getVelocityLabel(c.active_jobs),
               topSkill: c.top_skill || "Various",
+              location: c.location,
+              isPhCompany: c.is_ph_company,
             })
           );
           setCompanies(mappedComps);
@@ -192,7 +212,7 @@ const LocationCompany = () => {
     };
 
     fetchData();
-  }, []);
+  }, [salaryPeriod]);
 
   const displayedCompanies = showAllCompanies
     ? companies
@@ -219,9 +239,28 @@ const LocationCompany = () => {
               </div>
               <h3 className="text-lg font-bold text-gray-900">Top Locations</h3>
             </div>
-            <button className="text-sm text-indigo-600 font-medium hover:text-indigo-700">
-              View Map
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSalaryPeriod("monthly")}
+                className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+                  salaryPeriod === "monthly"
+                    ? "bg-purple-100 text-purple-700 font-semibold"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setSalaryPeriod("yearly")}
+                className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+                  salaryPeriod === "yearly"
+                    ? "bg-purple-100 text-purple-700 font-semibold"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                Yearly
+              </button>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -317,8 +356,20 @@ const LocationCompany = () => {
                       {comp.name.substring(0, 1)}
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900">{comp.name}</h4>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-gray-900">{comp.name}</h4>
+                        {comp.isPhCompany && (
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                            🇵🇭 PH
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-gray-500">{comp.industry}</p>
+                      {comp.location && (
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {comp.location}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="text-right">
